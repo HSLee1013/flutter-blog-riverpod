@@ -14,7 +14,7 @@ class SessionUser {
 }
 
 class SessionGVM extends Notifier<SessionUser> {
-  // 2: mContext는 최상단 context
+  // mContext는 최상단 context
   final mContext = navigatorKey.currentContext!;
   UserRepository userRepository = const UserRepository();
 
@@ -34,7 +34,7 @@ class SessionGVM extends Notifier<SessionUser> {
         await userRepository.findByUsernameAndPassword(body);
     if (!responseBody["success"]) {
       ScaffoldMessenger.of(mContext!).showSnackBar(
-        SnackBar(content: Text("회원가입 실패 : ${responseBody["errorMessage"]}")),
+        SnackBar(content: Text("로그인 실패 : ${responseBody["errorMessage"]}")),
       );
       return;
     }
@@ -49,9 +49,8 @@ class SessionGVM extends Notifier<SessionUser> {
         accessToken: accessToken,
         isLogin: true);
     // 3. Dio 토큰 세팅
-    dio.options.headers = {"Authorization": accessToken};
+    dio.options.headers["Authorization"] = accessToken;
     // Logger().d(dio.options.headers);
-
     Navigator.popAndPushNamed(mContext, "/post/list");
   }
 
@@ -80,7 +79,10 @@ class SessionGVM extends Notifier<SessionUser> {
     // 2. 상태 갱신
     state = SessionUser();
 
-    // 3. 화면 이동
+    // 3. dio 갱신
+    dio.options.headers["Authorization"] = "";
+
+    // 4. 화면 이동
     Navigator.popAndPushNamed(mContext, "/login");
   }
 
@@ -91,6 +93,7 @@ class SessionGVM extends Notifier<SessionUser> {
 
     if (accessToken == null) {
       Navigator.popAndPushNamed(mContext, "/login");
+      return;
     }
 
     Map<String, dynamic> responseBody =
@@ -110,7 +113,7 @@ class SessionGVM extends Notifier<SessionUser> {
         isLogin: true);
 
     // 3. Dio 토큰 세팅
-    dio.options.headers = {"Authorization": accessToken};
+    dio.options.headers["Authorization"] = accessToken;
 
     Navigator.popAndPushNamed(mContext, "/post/list");
   }
